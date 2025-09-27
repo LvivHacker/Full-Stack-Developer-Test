@@ -1,0 +1,11 @@
+#VSCode
+.vscode/
+.DB_store
+
+# Dotnet
+bin/
+obj/
+
+# Node
+node_modules/
+dist/
