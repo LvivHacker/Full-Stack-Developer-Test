@@ -2,17 +2,16 @@ import { useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
 
 interface RegisterFormProps {
-  onSubmit: (data: { username: string; email: string; password: string }) => void;
+  onSubmit: (data: { username: string; password: string }) => void;
 }
 
 export default function RegisterForm({ onSubmit }: RegisterFormProps) {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ username, email, password });
+    onSubmit({ username, password });
   };
 
   return (
@@ -20,10 +19,10 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
       <TextField
         margin="normal"
         fullWidth
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        type="username"
+        label="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
       />
       <TextField
         margin="normal"
