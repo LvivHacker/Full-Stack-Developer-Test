@@ -1,16 +1,10 @@
 // src/context/AuthContext.tsx
-import { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 import * as authApi from "../api/auth";
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  token: string;
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: string | null;
+  token: string | null;
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -18,39 +12,38 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<string | null>(localStorage.getItem("user"));
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
 
   const login = async (username: string, password: string) => {
-    try {
-      const loggedUser = await authApi.login(username, password);
-      setUser(loggedUser);
-      localStorage.setItem("user", JSON.stringify(loggedUser));
-    } catch (err) {
-      throw err;
-    }
+    const data = await authApi.login(username, password);
+    setUser(username);
+    setToken(data.token);
+    localStorage.setItem("user", username);
+    localStorage.setItem("token", data.token);
   };
 
   const register = async (username: string, email: string, password: string) => {
-    const newUser = await authApi.register(username, email, password);
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
+    await authApi.register(username, email, password);
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
-}
+};

@@ -1,31 +1,30 @@
 // src/api/auth.ts
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  token: string;
-}
+export async function login(username: string, password: string) {
 
-export async function login(username: string, password: string): Promise<User> {
-  // Простая проверка — один тестовый юзер
-  if (username === "test" && password === "1234") {
-    return {
-      id: 1,
-      username: "test",
-      email: "test@example.com",
-      token: "fake-jwt-token"
-    };
+  const response = await fetch("http://localhost:5108/api/auth/login", {
+    method: "POST",
+    headers: { 'Content-Type': "application/json"},
+    body: JSON.stringify({ username, password}),
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "Login failed");
   }
-  throw new Error("Invalid credentials");
+  return response.json();
 }
 
-export async function register(username: string, email: string, password: string): Promise<User> {
-  // В реальности — POST на backend
-  return {
-    id: Date.now(),
-    username,
-    email,
-    token: "fake-jwt-token"
-  };
+export async function register(username: string, email: string, password: string) {
+
+  const response = await fetch("http://localhost:5108/api/auth/register", {
+    method: "POST",
+    headers: { 'Content-Type': "application/json"},
+    body: JSON.stringify({ username, email, password}),
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    console.log(message)
+    throw new Error(message || "Registration failed");
+  }
+  return response.json();
 }
